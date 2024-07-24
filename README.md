@@ -164,9 +164,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Thanks to all contributors who have helped shape this project
 - Inspired by the need for a flexible, dataframe-agnostic metrics library
-
-## Contact
-
-Your Name - your.email@example.com
-
-Project Link: [https://github.com/yourusername/metrics_library](https://github.com/yourusername/metrics_library)
