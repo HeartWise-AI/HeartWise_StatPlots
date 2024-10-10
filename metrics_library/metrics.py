@@ -1,11 +1,11 @@
+import inspect
 import numpy as np
 
 from tqdm import tqdm
 from scipy import stats
-from numpy.typing import NDArray
-from sklearn.metrics import auc, confusion_matrix, mean_squared_error, roc_curve, average_precision_score
 from enum import Enum, auto
 from typing import Callable
+from sklearn.metrics import auc, confusion_matrix, mean_squared_error, roc_curve, average_precision_score
 
 from metrics_library.type_check import type_check
 
@@ -144,12 +144,12 @@ class MetricsComputer:
     @classmethod
     @type_check(enabled=True, y_true=np.ndarray, y_pred=np.ndarray, dtypes={"y_true": np.int64, "y_pred": np.float64}, metrics=list, cutoff=str, bootstrap=bool, n_iterations=int)
     def compute_classification_metrics(cls, y_true: np.ndarray, y_pred: np.ndarray, metrics: list, cutoff: str = 'default', bootstrap: bool = False, n_iterations: int = 1000) -> dict:
-        if cutoff not in ['optimal', 'default']:
-            raise ValueError("Cutoff must be 'optimal' or 'default'")
+        if cutoff not in ['youden', 'default']:
+            raise ValueError("Cutoff must be 'youden' or 'default'")
 
-        cutoff = 0.5
-        if cutoff == 'optimal':
-            cutoff = cls.optimal_cutoff(y_true, y_pred)
+        actual_cutoff = 0.5
+        if cutoff == 'youden':
+            actual_cutoff = cls.optimal_cutoff(y_true, y_pred)
 
         metrics_to_compute = []
         for metric in metrics:
@@ -162,11 +162,21 @@ class MetricsComputer:
         for metric in metrics_to_compute:
             func = getattr(MetricsComputer, metric.name.lower())
 
+            # Inspect the signature of the metric function
+            sig = inspect.signature(func)
+            func_params = sig.parameters
+
+            # Prepare arguments based on the function's parameters
+            kwargs = {}
+            if 'threshold' in func_params:
+                kwargs['threshold'] = actual_cutoff
+
             if bootstrap and metric != ClassificationMetrics.OPTIMAL_CUTOFF:
-                mean, ci = cls.__bootstrap(y_true, y_pred, func, n_iterations)
+                bootstrap_func = lambda y_t, y_p: func(y_t, y_p, **kwargs)
+                mean, ci = cls.__bootstrap(y_true, y_pred, bootstrap_func, n_iterations)
                 results[metric.name.lower()] = {"mean": mean, "ci": ci}
             else:
-                results[metric.name.lower()] = func(y_true, y_pred)
+                results[metric.name.lower()] = func(y_true, y_pred, **kwargs)
 
         return results
 
