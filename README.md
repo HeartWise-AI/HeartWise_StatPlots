@@ -1,31 +1,52 @@
-# Metrics Library
+# HeartWise StatPlots Metrics Library
 
-A dataframe-agnostic Python library for computing classification and regression metrics.
+A Python library for computing and visualizing classification and regression metrics, with a focus on medical and healthcare applications.
 
-## Features
+## Table of Contents
 
-- Supports both classification and regression tasks
-- Dataframe-agnostic: works with lists, numpy arrays, pandas Series, etc.
-- Easy-to-use interface with a single `MetricsComputer` class
-- Utilizes Poetry for dependency management and packaging
+- [Features](#features)
+  - [Classification Metrics](#classification-metrics)
+  - [Regression Metrics](#regression-metrics)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Classification Example](#classification-example)
+  - [Regression Example](#regression-example)
+- [Development](#development)
+  - [Setting Up the Development Environment](#setting-up-the-development-environment)
+  - [Code Formatting and Linting](#code-formatting-and-linting)
+  - [Pre-commit Hooks](#pre-commit-hooks)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+## 🚀 Features
+
+- **Comprehensive Metric Computation**: Supports a wide range of classification and regression metrics.
+- **Type-Safe Implementation**: Utilizes custom type checking to ensure data integrity and prevent errors.
+- **Flexible Input Handling**: Works with NumPy arrays, supporting both integer and float data types.
+- **Bootstrapping Capability**: Offers bootstrapping for robust statistical analysis and confidence interval estimation.
+- **Customizable Threshold Selection**: Allows for optimal cutoff point determination in classification tasks.
+
 
 ### Classification Metrics
 
-- Area Under the Curve (AUC)
-- Sensitivity (True Positive Rate)
-- Specificity (True Negative Rate)
-- Positive Predictive Value (PPV)
-- Negative Predictive Value (NPV)
-- Optimal Cutoff Point
+- **Area Under the Curve (AUC)**
+- **Average Precision (AUPRC)**
+- **Sensitivity (True Positive Rate)**
+- **Specificity (True Negative Rate)**
+- **Positive Predictive Value (PPV)**
+- **Negative Predictive Value (NPV)**
+- **Optimal Cutoff Point**
 
 ### Regression Metrics
 
-- Mean Absolute Error (MAE)
-- Mean Squared Error (MSE)
-- Pearson Correlation
-- Spearman Correlation
+- **Mean Absolute Error (MAE)**
+- **Mean Squared Error (MSE)**
+- **Pearson Correlation**
+- **Spearman Correlation**
 
-## Installation
+## 🛠️ Installation
 
 This project uses Poetry for dependency management. To install the library and its dependencies:
 
@@ -33,8 +54,8 @@ This project uses Poetry for dependency management. To install the library and i
 
 2. Clone this repository:
    ```
-   git clone https://github.com/yourusername/metrics_library.git
-   cd metrics_library
+   git clone https://github.com/HeartWise-AI/HeartWise_StatPlots.git
+   cd HeartWise_StatPlots
    ```
 
 3. Install the dependencies using Poetry:
@@ -42,93 +63,41 @@ This project uses Poetry for dependency management. To install the library and i
    poetry install
    ```
 
-## Usage
+## 📄 Usage
 
-Here's a simple example of how to use the Metrics Library:
+See more examples in [examples.py](examples.py)
+
+### Classification Example
 
 ```python
-from metrics_library.metrics import MetricsComputer
 import numpy as np
+from metrics_library.metrics import MetricsComputer, ClassificationMetrics
 
 # Classification example
-y_true_class = np.array([0, 1, 1, 0, 1])
-y_pred_class = np.array([0, 1, 0, 0, 1])
-y_pred_proba = np.array([0.1, 0.9, 0.4, 0.3, 0.8])
+y_true = np.array([0, 1, 1, 0, 1], dtype=np.int64)
+y_pred = np.array([0.1, 0.9, 0.4, 0.3, 0.8], dtype=np.float64)
 
-class_metrics = MetricsComputer(y_true_class, y_pred_class, task='classification', y_pred_proba=y_pred_proba)
-class_results = class_metrics.compute_metrics()
-print("Classification Metrics:", class_results)
+metrics = [ClassificationMetrics.AUC, ClassificationMetrics.SENSITIVITY, ClassificationMetrics.SPECIFICITY]
+results = MetricsComputer.compute_classification_metrics(y_true, y_pred, metrics=metrics, bootstrap=True, n_iterations=1000)
+print("Classification Metrics:", results)
+```
+
+### Regression Example
+
+```python
+import numpy as np
+from metrics_library.metrics import MetricsComputer, RegressionMetrics
 
 # Regression example
-y_true_reg = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
-y_pred_reg = np.array([1.1, 2.2, 2.9, 3.8, 5.2])
+y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.int64)
+y_pred = np.array([1.1, 2.2, 2.9, 3.8, 5.2], dtype=np.float64)
 
-reg_metrics = MetricsComputer(y_true_reg, y_pred_reg, task='regression')
-reg_results = reg_metrics.compute_metrics()
-print("Regression Metrics:", reg_results)
+metrics = [RegressionMetrics.MAE, RegressionMetrics.MSE, RegressionMetrics.PEARSON_CORRELATION]
+results = MetricsComputer.compute_regression_metrics(y_true, y_pred, metrics=metrics, bootstrap=True, n_iterations=1000)
+print("Regression Metrics:", results)
 ```
 
-You can also run the example script directly using Poetry:
-
-```
-poetry run metrics-example
-```
-
-For more detailed examples, see the `main.py` file in the `metrics_library` directory.
-
-## Development
-
-To set up the development environment:
-
-1. Clone the repository (if you haven't already):
-   ```
-   git clone https://github.com/yourusername/metrics_library.git
-   cd metrics_library
-   ```
-
-2. Install the dependencies, including development dependencies:
-   ```
-   poetry install
-   ```
-
-3. Activate the virtual environment:
-   ```
-   poetry shell
-   ```
-
-4. Run tests:
-   ```
-   pytest
-   ```
-
-### Code Formatting and Linting
-
-We use several tools to maintain code quality and consistency:
-
-- Black for code formatting
-- isort for sorting imports
-- pylint for linting
-- mypy for static type checking
-
-You can run these tools using the following commands:
-
-```
-poetry run black .
-poetry run isort .
-poetry run pylint metrics_library tests
-poetry run mypy metrics_library tests
-```
-
-Alternatively, you can use the provided Makefile:
-
-```
-make format  # Runs black and isort
-make lint    # Runs pylint
-make test    # Runs pytest
-make all     # Runs format, lint, and test
-```
-
-### Pre-commit Hooks
+### 🔧 Pre-commit Hooks
 
 We use pre-commit hooks to ensure code quality before committing changes. To set up pre-commit hooks:
 
@@ -144,23 +113,19 @@ We use pre-commit hooks to ensure code quality before committing changes. To set
 
 Now, the formatting and linting checks will run automatically before each commit.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. Here's how you can contribute:
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create a new branch for your feature or bug fix
+3. Add tests for your changes
+4. Make your changes and commit them with clear, descriptive messages
+5. Push your changes to your fork
+6. Submit a pull request to the main repository
 
-Please make sure to update tests as appropriate and adhere to the code formatting guidelines.
+## 📞 Contact
 
-## License
+For any questions, please contact:
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Thanks to all contributors who have helped shape this project
-- Inspired by the need for a flexible, dataframe-agnostic metrics library
+- [Jacques Delfrate](mailto:jacques.delfrate@heartwise.ai)

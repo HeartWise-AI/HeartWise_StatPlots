@@ -24,7 +24,7 @@ if mode == 'classification':
     y_pred = y_pred.astype(np.float64)
     y_true = y_true.astype(np.int64)
 
-    all_reg_metrics = MetricsComputer.compute_classification_metrics(y_true, y_pred, [ClassificationMetrics.ALL], cutoff='optimal', bootstrap=True, n_iterations=1000)
+    all_reg_metrics = MetricsComputer.compute_classification_metrics(y_true, y_pred, [ClassificationMetrics.ALL], cutoff='default', bootstrap=True, n_iterations=1000)
     print("All Classification Metrics:", all_reg_metrics)
     print(f"AUPRC: {all_reg_metrics[ClassificationMetrics.AUPRC.name.lower()]}")
     print(f"AUC: {all_reg_metrics[ClassificationMetrics.AUC.name.lower()]}")
