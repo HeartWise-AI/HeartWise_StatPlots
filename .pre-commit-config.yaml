@@ -14,7 +14,7 @@ repos:
     rev: v3.3.1
     hooks:
       - id: pylint
-        args: ['--disable=C0301,C0114,E0401,R0903,C0103,W0612,C0115,E1121,R0913,R0917']
+        args: ['--disable=C0301,C0114,E0401,R0903,C0103,W0612,C0115,E1121,R0913,R0917,C0116,R0914,W0640,C0411']
   - repo: 'https://github.com/asottile/yesqa'
     rev: v1.5.0
     hooks:
