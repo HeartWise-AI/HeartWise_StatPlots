@@ -26,6 +26,31 @@ def execute(custom: Callable) -> Any:
 def combine_arrays(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     return a + b
 
+# Additional Sample Functions for Testing Multiple dtypes
+@type_check(
+    enabled=True,
+    y_true=np.ndarray,
+    y_pred=np.ndarray,
+    dtypes={
+        "y_true": (np.int64, np.float64),  # Accept both int64 and float64
+        "y_pred": np.float64
+    },
+    metric_func=Callable,
+    n_iterations=int,
+)
+def sample_function(y_true: np.ndarray, y_pred: np.ndarray, metric_func: Callable, n_iterations: int):
+    pass 
+
+@type_check(
+    enabled=True,
+    data=np.ndarray,
+    dtypes={
+        "data": (np.int32, np.int64, np.float32, np.float64),
+    },
+)
+def another_sample_function(data: np.ndarray):
+    pass
+
 # Tests for correct type usage
 def test_concatenate_success():
     result = concatenate(5, "test")
@@ -101,6 +126,51 @@ def test_combine_arrays_failure():
     with pytest.raises(TypeCheckError) as exc_info:
         combine_arrays(a_correct, b_wrong_dtype)
     assert "Argument 'b' must be of type numpy.ndarray with dtype float64, not ndarray" in str(exc_info.value)
+
+# Tests for another_sample_function accepting multiple dtypes for data
+def test_another_sample_function_valid_dtypes():
+    # data as int32
+    data_int32 = np.array([1, 2, 3], dtype=np.int32)
+    try:
+        another_sample_function(data_int32)
+    except TypeCheckError:
+        pytest.fail("TypeCheckError was raised unexpectedly with valid dtype (int32).")
+
+    # data as int64
+    data_int64 = np.array([1, 2, 3], dtype=np.int64)
+    try:
+        another_sample_function(data_int64)
+    except TypeCheckError:
+        pytest.fail("TypeCheckError was raised unexpectedly with valid dtype (int64).")
+
+    # data as float32
+    data_float32 = np.array([1.0, 2.0, 3.0], dtype=np.float32)
+    try:
+        another_sample_function(data_float32)
+    except TypeCheckError:
+        pytest.fail("TypeCheckError was raised unexpectedly with valid dtype (float32).")
+
+    # data as float64
+    data_float64 = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+    try:
+        another_sample_function(data_float64)
+    except TypeCheckError:
+        pytest.fail("TypeCheckError was raised unexpectedly with valid dtype (float64).")
+
+def test_another_sample_function_invalid_dtypes():
+    # data with unsupported dtype (object)
+    data_object = np.array([1, '2', 3], dtype=object)
+    with pytest.raises(TypeCheckError) as exc_info:
+        another_sample_function(data_object)
+    assert "data" in str(exc_info.value)
+    assert "numpy.ndarray with dtype in (int32, int64, float32, float64)" in str(exc_info.value)
+
+    # data with unsupported dtype (bool)
+    data_bool = np.array([True, False, True], dtype=bool)
+    with pytest.raises(TypeCheckError) as exc_info:
+        another_sample_function(data_bool)
+    assert "data" in str(exc_info.value)
+    assert "numpy.ndarray with dtype in (int32, int64, float32, float64)" in str(exc_info.value)
 
 # Tests for decorator disabled
 @type_check(enabled=False, a=int, b=str)

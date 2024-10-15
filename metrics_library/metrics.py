@@ -56,7 +56,10 @@ class MetricsComputer:
         enabled=True,
         y_true=np.ndarray,
         y_pred=np.ndarray,
-        dtypes={"y_true": np.int64, "y_pred": np.float64},
+        dtypes={
+            "y_true": (np.int64, np.float64),
+            "y_pred": np.float64,
+        },
         metric_func=Callable,
         n_iterations=int,
     )
@@ -215,7 +218,7 @@ class MetricsComputer:
         enabled=True,
         y_true=np.ndarray,
         y_pred=np.ndarray,
-        dtypes={"y_true": np.int64, "y_pred": np.float64},
+        dtypes={"y_true": np.float64, "y_pred": np.float64},
     )
     def mae(cls, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         return float(np.mean(np.abs(y_true - y_pred)))
@@ -225,7 +228,7 @@ class MetricsComputer:
         enabled=True,
         y_true=np.ndarray,
         y_pred=np.ndarray,
-        dtypes={"y_true": np.int64, "y_pred": np.float64},
+        dtypes={"y_true": np.float64, "y_pred": np.float64},
     )
     def mse(cls, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         return float(mean_squared_error(y_true, y_pred))
@@ -235,7 +238,7 @@ class MetricsComputer:
         enabled=True,
         y_true=np.ndarray,
         y_pred=np.ndarray,
-        dtypes={"y_true": np.int64, "y_pred": np.float64},
+        dtypes={"y_true": np.float64, "y_pred": np.float64},
     )
     def pearson_correlation(cls, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         return float(stats.pearsonr(y_true, y_pred)[0])
@@ -245,7 +248,7 @@ class MetricsComputer:
         enabled=True,
         y_true=np.ndarray,
         y_pred=np.ndarray,
-        dtypes={"y_true": np.int64, "y_pred": np.float64},
+        dtypes={"y_true": np.float64, "y_pred": np.float64},
     )
     def spearman_correlation(cls, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         return float(stats.spearmanr(y_true, y_pred)[0])
@@ -316,7 +319,7 @@ class MetricsComputer:
         enabled=True,
         y_true=np.ndarray,
         y_pred=np.ndarray,
-        dtypes={"y_true": np.int64, "y_pred": np.float64},
+        dtypes={"y_true": np.float64, "y_pred": np.float64},
         metrics=list,
         bootstrap=bool,
         n_iterations=int,
