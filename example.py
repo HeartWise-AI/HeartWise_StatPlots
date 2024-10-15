@@ -2,6 +2,7 @@
 
 import os
 import numpy as np
+from scipy.special import expit
 from metrics_library.metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
 
 root = '/media/data1/achilsowa/for_jacques/'
@@ -13,13 +14,7 @@ mode = 'classification' # 'classification' or 'regression'
 
 if mode == 'classification':
 
-    def stable_sigmoid(x):
-        x_safe = np.clip(x, -500, 500)
-        return np.where(x_safe >= 0, 
-                        1 / (1 + np.exp(-x_safe)), 
-                        np.exp(x_safe) / (1 + np.exp(x_safe)))
-
-    y_pred = stable_sigmoid(y_pred)
+    y_pred = expit(y_pred)
 
     y_pred = y_pred.astype(np.float64)
     y_true = y_true.astype(np.int64)
