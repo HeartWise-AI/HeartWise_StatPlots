@@ -42,9 +42,8 @@ class MetricsComputer:
         unique_values = np.unique(y_true)
         if len(unique_values) > 2:
             raise ValueError("y_true must be binary for classification metrics")
-        if len(unique_values) == 2:
-            if unique_values[0] != 0 and unique_values[1] != 1:
-                raise ValueError("y_true values must be equal to 0 or 1")
+        if unique_values[0] != 0 and unique_values[1] != 1:
+            raise ValueError("y_true values must be equal to 0 or 1")
 
     @classmethod
     @type_check(enabled=True, dtypes={"y_pred": np.float64}, y_pred=np.ndarray)
