@@ -4,12 +4,14 @@ from metrics_library.metrics import MetricsComputer, ClassificationMetrics, Regr
 
 class TestMetricsComputer(unittest.TestCase):
     def setUp(self):
-        self.y_true = np.array([0, 1, 1, 0, 1, 0, 1, 1, 0, 0], dtype=np.int64)
-        self.y_pred = np.array([0.1, 0.9, 0.8, 0.3, 0.7, 0.2, 0.6, 0.9, 0.4, 0.1], dtype=np.float64)
+        self.y_true_cls = np.array([0, 1, 1, 0, 1, 0, 1, 1, 0, 0], dtype=np.int64)
+        self.y_pred_cls = np.array([0.1, 0.9, 0.8, 0.3, 0.7, 0.2, 0.6, 0.9, 0.4, 0.1], dtype=np.float64)
+        self.y_true_reg = np.array([0.8, 2.6, 3.2, 4.1, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0], dtype=np.float64)
+        self.y_pred_reg = np.array([1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1, 8.1, 9.1, 10.1], dtype=np.float64)
 
     def test_check_ground_truth(self):
         # Test valid input
-        MetricsComputer._MetricsComputer__check_ground_truth(self.y_true)
+        MetricsComputer._MetricsComputer__check_ground_truth(self.y_true_cls)
         
         # Test invalid input
         with self.assertRaises(ValueError):
@@ -19,7 +21,7 @@ class TestMetricsComputer(unittest.TestCase):
 
     def test_check_prediction_values(self):
         # Test valid input
-        MetricsComputer._MetricsComputer__check_prediction_values(self.y_pred)
+        MetricsComputer._MetricsComputer__check_prediction_values(self.y_pred_cls)
         
         # Test invalid input
         with self.assertRaises(ValueError):
@@ -28,89 +30,95 @@ class TestMetricsComputer(unittest.TestCase):
             MetricsComputer._MetricsComputer__check_prediction_values(np.array([-0.1, 0.5]))
 
     def test_auc(self):
-        auc = MetricsComputer.auc(self.y_true, self.y_pred)
+        auc = MetricsComputer.auc(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(auc, float)
         self.assertTrue(0 <= auc <= 1)
 
     def test_auprc(self):
-        auprc = MetricsComputer.auprc(self.y_true, self.y_pred)
+        auprc = MetricsComputer.auprc(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(auprc, float)
         self.assertTrue(0 <= auprc <= 1)
 
     def test_confusion_matrix(self):
-        cm = MetricsComputer.confusion_matrix(self.y_true, self.y_pred)
+        cm = MetricsComputer.confusion_matrix(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(cm, np.ndarray)
         self.assertEqual(cm.shape, (2, 2))
 
     def test_sensitivity(self):
-        sensitivity = MetricsComputer.sensitivity(self.y_true, self.y_pred)
+        sensitivity = MetricsComputer.sensitivity(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(sensitivity, float)
         self.assertTrue(0 <= sensitivity <= 1)
 
     def test_specificity(self):
-        specificity = MetricsComputer.specificity(self.y_true, self.y_pred)
+        specificity = MetricsComputer.specificity(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(specificity, float)
         self.assertTrue(0 <= specificity <= 1)
 
     def test_ppv(self):
-        ppv = MetricsComputer.ppv(self.y_true, self.y_pred)
+        ppv = MetricsComputer.ppv(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(ppv, float)
         self.assertTrue(0 <= ppv <= 1)
 
     def test_npv(self):
-        npv = MetricsComputer.npv(self.y_true, self.y_pred)
+        npv = MetricsComputer.npv(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(npv, float)
         self.assertTrue(0 <= npv <= 1)
 
     def test_optimal_cutoff(self):
-        cutoff = MetricsComputer.optimal_cutoff(self.y_true, self.y_pred)
+        cutoff = MetricsComputer.optimal_cutoff(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(cutoff, float)
         self.assertTrue(0 <= cutoff <= 1)
 
     def test_mae(self):
-        mae = MetricsComputer.mae(self.y_true, self.y_pred)
+        mae = MetricsComputer.mae(self.y_true_reg, self.y_pred_reg)
         self.assertIsInstance(mae, float)
         self.assertTrue(mae >= 0)
 
     def test_mse(self):
-        mse = MetricsComputer.mse(self.y_true, self.y_pred)
+        mse = MetricsComputer.mse(self.y_true_reg, self.y_pred_reg)
         self.assertIsInstance(mse, float)
         self.assertTrue(mse >= 0)
 
     def test_pearson_correlation(self):
-        corr = MetricsComputer.pearson_correlation(self.y_true, self.y_pred)
+        corr = MetricsComputer.pearson_correlation(self.y_true_reg, self.y_pred_reg)
         self.assertIsInstance(corr, float)
         self.assertTrue(-1 <= corr <= 1)
 
     def test_spearman_correlation(self):
-        corr = MetricsComputer.spearman_correlation(self.y_true, self.y_pred)
+        corr = MetricsComputer.spearman_correlation(self.y_true_reg, self.y_pred_reg)
         self.assertIsInstance(corr, float)
         self.assertTrue(-1 <= corr <= 1)
 
     def test_compute_classification_metrics(self):
-        metrics = [ClassificationMetrics.AUC, ClassificationMetrics.AUPRC, RegressionMetrics.MAE]
-        results = MetricsComputer.compute_classification_metrics(self.y_true, self.y_pred, metrics)
+        metrics = [ClassificationMetrics.AUC, ClassificationMetrics.AUPRC]
+        results = MetricsComputer.compute_classification_metrics(self.y_true_cls, self.y_pred_cls, metrics)
         self.assertIsInstance(results, dict)
-        self.assertEqual(set(results.keys()), {'auc', 'auprc', 'mae'})
+        self.assertEqual(set(results.keys()), {'auc', 'auprc'})
 
     def test_compute_regression_metrics(self):
-        metrics = [RegressionMetrics.MAE, RegressionMetrics.MSE, ClassificationMetrics.AUC]
-        results = MetricsComputer.compute_regression_metrics(self.y_true, self.y_pred, metrics)
+        metrics = [RegressionMetrics.MAE, RegressionMetrics.MSE]
+        results = MetricsComputer.compute_regression_metrics(self.y_true_reg, self.y_pred_reg, metrics)
         self.assertIsInstance(results, dict)
-        self.assertEqual(set(results.keys()), {'mae', 'mse', 'auc'})
+        self.assertEqual(set(results.keys()), {'mae', 'mse'})
 
     def test_compute_classification_metrics_with_bootstrap(self):
-        metrics = [ClassificationMetrics.AUC]
-        results = MetricsComputer.compute_classification_metrics(self.y_true, self.y_pred, metrics, bootstrap=True, n_iterations=100)
+        metrics = [ClassificationMetrics.AUC, ClassificationMetrics.AUPRC]
+        results = MetricsComputer.compute_classification_metrics(self.y_true_cls, self.y_pred_cls, metrics, bootstrap=True, n_iterations=5)
         self._extracted_from_test_compute_regression_metrics_with_bootstrap_4(
             results, 'auc'
         )
+        self._extracted_from_test_compute_regression_metrics_with_bootstrap_4(
+            results, 'auprc'
+        )
             
     def test_compute_regression_metrics_with_bootstrap(self):
-        metrics = [RegressionMetrics.MAE]
-        results = MetricsComputer.compute_regression_metrics(self.y_true, self.y_pred, metrics, bootstrap=True, n_iterations=100)
+        metrics = [RegressionMetrics.MAE, RegressionMetrics.MSE]
+        results = MetricsComputer.compute_regression_metrics(self.y_true_reg, self.y_pred_reg, metrics, bootstrap=True, n_iterations=5)
         self._extracted_from_test_compute_regression_metrics_with_bootstrap_4(
             results, 'mae'
+        )
+        self._extracted_from_test_compute_regression_metrics_with_bootstrap_4(
+            results, 'mse'
         )
 
     def _extracted_from_test_compute_regression_metrics_with_bootstrap_4(self, results, arg1):

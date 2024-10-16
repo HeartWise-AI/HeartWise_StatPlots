@@ -58,9 +58,23 @@ This project uses Poetry for dependency management. To install the library and i
    cd HeartWise_StatPlots
    ```
 
-3. Install the dependencies using Poetry:
+3. Install the dependencies:
+   Using Poetry:
    ```
    poetry install
+   ```
+   Using pip:
+   Create a new virtual environment:
+   ```
+   python -m venv stats_plots
+   ```
+   Activate the virtual environment:
+   ```
+   source stats_plots/bin/activate
+   ```
+   Install the dependencies:
+   ```
+   pip install -r requirements.txt
    ```
 
 ## 📄 Usage
@@ -89,7 +103,7 @@ import numpy as np
 from metrics_library.metrics import MetricsComputer, RegressionMetrics
 
 # Regression example
-y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.int64)
+y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.int64) 
 y_pred = np.array([1.1, 2.2, 2.9, 3.8, 5.2], dtype=np.float64)
 
 metrics = [RegressionMetrics.MAE, RegressionMetrics.MSE, RegressionMetrics.PEARSON_CORRELATION]
