@@ -3,7 +3,7 @@ name: Python Unit Tests
 on:
   push:
     branches:
-      - [dev, main]
+      - dev
   pull_request:
     branches:
       - main
@@ -25,9 +25,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install HeartWise_statplots from dev branch
+      - name: Install Dependencies
         run: |
-          pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git@dev#egg=heartwise_statplots
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Install Test Dependencies
         run: |

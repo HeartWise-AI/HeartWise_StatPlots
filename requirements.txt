@@ -1,2 +1,6 @@
 pytest
 pytest-cov
+numpy
+pandas
+seaborn
+scikit-learn
