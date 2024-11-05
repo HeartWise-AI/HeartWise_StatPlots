@@ -1,15 +1,46 @@
-# metrics_library/type_check.py
 import inspect
-from typing import Union, Tuple, Type, Callable, Any, Optional, Dict
+from typing import Union, Tuple, Type, Callable, Any, Optional, Dict, get_origin, get_args
 import numpy as np
 import functools
 
 class TypeCheckError(TypeError):
     def __init__(self, arg_name: str, expected_type: Union[type, tuple, str], actual_type: type, additional_info: str = ""):
-        message = f"Argument '{arg_name}' must be of type {expected_type}, not {actual_type.__name__}"
+        expected_type_str = self._get_type_name(expected_type)
+        message = f"Argument '{arg_name}' must be of type {expected_type_str}, not {actual_type.__name__}"
         if additional_info:
             message += f". {additional_info}"
         super().__init__(message)
+    
+    def _get_type_name(self, expected_type: Union[type, tuple, str]) -> str:
+        if isinstance(expected_type, str):
+            return expected_type
+        elif isinstance(expected_type, tuple):
+            return " or ".join([self._get_type_name(t) for t in expected_type])
+        else:
+            origin = get_origin(expected_type)
+            if origin is Union:
+                args = get_args(expected_type)
+                return " or ".join([self._get_type_name(arg) for arg in args])
+            elif hasattr(expected_type, '__name__'):
+                return expected_type.__name__
+            else:
+                return str(expected_type)
+
+    @staticmethod
+    def _get_type_name_static(expected_type: Union[type, tuple, str]) -> str:
+        if isinstance(expected_type, str):
+            return expected_type
+        elif isinstance(expected_type, tuple):
+            return " or ".join([TypeCheckError._get_type_name(t) for t in expected_type])
+        else:
+            origin = get_origin(expected_type)
+            if origin is Union:
+                args = get_args(expected_type)
+                return " or ".join([TypeCheckError()._get_type_name(arg) for arg in args])
+            elif hasattr(expected_type, '__name__'):
+                return expected_type.__name__
+            else:
+                return str(expected_type)
 
 def type_check(enabled: bool = True, dtypes: Optional[Dict[str, Union[np.dtype, type]]] = None, **type_hints) -> Callable:
     """
@@ -31,18 +62,38 @@ def type_check(enabled: bool = True, dtypes: Optional[Dict[str, Union[np.dtype, 
             if not enabled:
                 return func(*args, **kwargs)
 
-            bound_args = func.__signature__.bind(*args, **kwargs)
+            # Bind the arguments to the function's signature
+            bound_args = inspect.signature(func).bind(*args, **kwargs)
             bound_args.apply_defaults()
 
             for arg_name, expected_type in type_hints.items():
                 if arg_name in bound_args.arguments:
                     value = bound_args.arguments[arg_name]
                     
-                    if isinstance(expected_type, tuple):
-                        if not isinstance(value, expected_type):
+                    # Handle Union types and other generics
+                    origin = get_origin(expected_type)
+                    if origin is Union:
+                        expected_types = get_args(expected_type)
+                        if not isinstance(value, expected_types):
+                            expected_types_str = " or ".join([TypeCheckError._get_type_name_static(t) for t in expected_types])
                             raise TypeCheckError(
                                 arg_name, 
-                                " or ".join(t.__name__ for t in expected_type), 
+                                expected_types_str, 
+                                type(value)
+                            )
+                    elif hasattr(expected_type, '__origin__') and expected_type.__origin__ == Callable:
+                        if not callable(value):
+                            raise TypeCheckError(
+                                arg_name, 
+                                "Callable", 
+                                type(value)
+                            )
+                    elif isinstance(expected_type, tuple):
+                        if not isinstance(value, expected_type):
+                            expected_types_str = " or ".join([TypeCheckError._get_type_name_static(t) for t in expected_type])
+                            raise TypeCheckError(
+                                arg_name, 
+                                expected_types_str, 
                                 type(value)
                             )
                     elif expected_type == np.ndarray:
@@ -54,7 +105,6 @@ def type_check(enabled: bool = True, dtypes: Optional[Dict[str, Union[np.dtype, 
                             
                             # Handle tuple of dtypes
                             if isinstance(expected_dtype, tuple):
-                                # Convert all dtype specifications to np.dtype if they are np.generic subclasses
                                 expected_dtypes = []
                                 for dtype in expected_dtype:
                                     if isinstance(dtype, type) and issubclass(dtype, np.generic):
@@ -84,11 +134,17 @@ def type_check(enabled: bool = True, dtypes: Optional[Dict[str, Union[np.dtype, 
                                         type(value),
                                         f"Array has dtype {value.dtype}"
                                     )
-                    elif not isinstance(value, expected_type):
-                        raise TypeCheckError(arg_name, expected_type.__name__, type(value))
-
+                    else:
+                        if not isinstance(value, expected_type):
+                            expected_type_str = TypeCheckError._get_type_name_static(expected_type)
+                            raise TypeCheckError(
+                                arg_name, 
+                                expected_type_str, 
+                                type(value)
+                            )
             return func(*args, **kwargs)
         
-        func.__signature__ = inspect.signature(func)
+        # Set the signature of the original function to preserve introspection
+        wrapper.__signature__ = inspect.signature(func)
         return wrapper
     return decorator
