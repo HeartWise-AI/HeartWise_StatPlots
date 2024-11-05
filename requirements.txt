@@ -1,6 +1,0 @@
-numpy
-pandas
-seaborn
-scikit-learn
-pytest
-tqdm
