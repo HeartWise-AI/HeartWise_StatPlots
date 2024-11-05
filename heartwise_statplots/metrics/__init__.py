@@ -1,6 +1,6 @@
 import numpy as np
 
-from .metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
+from heartwise_statplots.metrics.metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
 
 __all__ = ["MetricsComputer", "ClassificationMetrics", "RegressionMetrics"]
 

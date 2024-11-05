@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from utils.type_check import type_check, TypeCheckError
+from heartwise_statplots.utils.type_check import type_check, TypeCheckError
 from typing import Any, Callable
 
 # Sample functions to test the decorator

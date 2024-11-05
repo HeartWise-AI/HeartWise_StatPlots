@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
+from heartwise_statplots.metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
 
 class TestMetricsComputer(unittest.TestCase):
     def setUp(self):

@@ -13,7 +13,7 @@ from sklearn.metrics import (
     average_precision_score,
 )
 
-from utils.type_check import type_check
+from heartwise_statplots.utils.type_check import type_check
 
 
 class ClassificationMetrics(Enum):
