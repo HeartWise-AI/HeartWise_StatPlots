@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='heartwise_utils',  # Replace with your package name
+    name='heartwise_statplots',  # Replace with your package name
     version='0.1.0',           # Initial version number
     author='Jacques Delfrate',
     author_email='jacques.delfrate@gmail.com',
