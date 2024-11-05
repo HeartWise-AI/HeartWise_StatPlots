@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from metrics_library.metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
+from metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
 
 class TestMetricsComputer(unittest.TestCase):
     def setUp(self):
