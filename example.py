@@ -3,11 +3,9 @@
 import os
 import numpy as np
 from scipy.special import expit
-from metrics_library.metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
+from heartwise_statplots.metrics import MetricsComputer, ClassificationMetrics, RegressionMetrics
 
-
-
-mode = 'regression' # 'classification' or 'regression'
+mode = 'classification' # 'classification' or 'regression'
 
 if mode == 'classification':
 
@@ -17,10 +15,10 @@ if mode == 'classification':
 
     y_pred = expit(y_pred)
 
-    y_pred = y_pred.astype(np.float64)
-    y_true = y_true.astype(np.int64)
+    y_pred = y_hat.to_numpy().astype(np.float64)
+    y_true = outcome.to_numpy().astype(np.int64)
 
-    all_reg_metrics = MetricsComputer.compute_classification_metrics(y_true, y_pred, [ClassificationMetrics.ALL], cutoff='default', bootstrap=True, n_iterations=1000)
+    all_reg_metrics = MetricsComputer.compute_classification_metrics(y_true, y_pred, [ClassificationMetrics.ALL], cutoff='youden', bootstrap=True, n_iterations=100)
     print("All Classification Metrics:", all_reg_metrics)
     print(f"AUPRC: {all_reg_metrics[ClassificationMetrics.AUPRC.name.lower()]}")
     print(f"AUC: {all_reg_metrics[ClassificationMetrics.AUC.name.lower()]}")
