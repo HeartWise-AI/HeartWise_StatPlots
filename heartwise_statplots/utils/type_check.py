@@ -4,6 +4,7 @@ import inspect
 from typing import Union, Tuple, Type, Callable, Any, Optional, Dict, get_origin, get_args
 import numpy as np
 import functools
+from collections.abc import Callable as ABC_Callable  # Import Callable from collections.abc
 
 
 class TypeCheckError(TypeError):
@@ -30,7 +31,7 @@ class TypeCheckError(TypeError):
             if origin is Union:
                 args = get_args(expected_type)
                 return " or ".join([self._get_type_name(arg) for arg in args])
-            elif origin is Callable:
+            elif origin is ABC_Callable:  # Updated check
                 return "Callable"
             elif hasattr(expected_type, "__name__"):
                 return expected_type.__name__
@@ -48,7 +49,7 @@ class TypeCheckError(TypeError):
             if origin is Union:
                 args = get_args(expected_type)
                 return " or ".join([TypeCheckError._get_type_name_static(arg) for arg in args])
-            elif origin is Callable:
+            elif origin is ABC_Callable:  # Updated check
                 return "Callable"
             elif hasattr(expected_type, "__name__"):
                 return expected_type.__name__
@@ -102,7 +103,7 @@ def type_check(
                                 expected_types_str,
                                 type(value),
                             )
-                    elif origin is Callable:
+                    elif origin is ABC_Callable:  # Updated check
                         if not callable(value):
                             raise TypeCheckError(
                                 arg_name,
