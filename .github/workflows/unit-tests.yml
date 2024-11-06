@@ -25,6 +25,23 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install Package from GitHub (dev branch)
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git@dev
+
+      - name: Install Package from GitHub (PR from dev)
+        if: >
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.ref == 'dev'
+        run: |
+          pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git@dev
+
+      - name: Install Package from GitHub (main branch)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git
+  
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
