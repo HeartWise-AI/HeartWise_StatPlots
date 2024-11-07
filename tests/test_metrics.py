@@ -39,6 +39,11 @@ class TestMetricsComputer(unittest.TestCase):
         self.assertIsInstance(auprc, float)
         self.assertTrue(0 <= auprc <= 1)
 
+    def test_f1_score(self):
+        f1 = MetricsComputer.f1_score(self.y_true_cls, self.y_pred_cls)
+        self.assertIsInstance(f1, float)
+        self.assertTrue(0 <= f1 <= 1)
+
     def test_confusion_matrix(self):
         cm = MetricsComputer.confusion_matrix(self.y_true_cls, self.y_pred_cls)
         self.assertIsInstance(cm, np.ndarray)
@@ -90,10 +95,10 @@ class TestMetricsComputer(unittest.TestCase):
         self.assertTrue(-1 <= corr <= 1)
 
     def test_compute_classification_metrics(self):
-        metrics = [ClassificationMetrics.AUC, ClassificationMetrics.AUPRC]
+        metrics = [ClassificationMetrics.AUC, ClassificationMetrics.AUPRC, ClassificationMetrics.F1_SCORE]
         results = MetricsComputer.compute_classification_metrics(self.y_true_cls, self.y_pred_cls, metrics)
         self.assertIsInstance(results, dict)
-        self.assertEqual(set(results.keys()), {'auc', 'auprc'})
+        self.assertEqual(set(results.keys()), {'auc', 'auprc', 'f1_score'})
 
     def test_compute_regression_metrics(self):
         metrics = [RegressionMetrics.MAE, RegressionMetrics.MSE]
@@ -102,13 +107,16 @@ class TestMetricsComputer(unittest.TestCase):
         self.assertEqual(set(results.keys()), {'mae', 'mse'})
 
     def test_compute_classification_metrics_with_bootstrap(self):
-        metrics = [ClassificationMetrics.AUC, ClassificationMetrics.AUPRC]
+        metrics = [ClassificationMetrics.AUC, ClassificationMetrics.AUPRC, ClassificationMetrics.F1_SCORE]
         results = MetricsComputer.compute_classification_metrics(self.y_true_cls, self.y_pred_cls, metrics, bootstrap=True, n_iterations=5)
         self._extracted_from_test_compute_regression_metrics_with_bootstrap_4(
             results, 'auc'
         )
         self._extracted_from_test_compute_regression_metrics_with_bootstrap_4(
             results, 'auprc'
+        )
+        self._extracted_from_test_compute_regression_metrics_with_bootstrap_4(
+            results, 'f1_score'
         )
             
     def test_compute_regression_metrics_with_bootstrap(self):

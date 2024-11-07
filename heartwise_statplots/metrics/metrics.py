@@ -11,9 +11,14 @@ from sklearn.metrics import (
     mean_squared_error,
     roc_curve,
     average_precision_score,
+    f1_score
 )
 
+<<<<<<< HEAD:heartwise_statplots/metrics/metrics.py
 from heartwise_statplots.utils.type_check import type_check
+=======
+from .type_check import type_check
+>>>>>>> main:metrics_library/metrics.py
 
 
 class ClassificationMetrics(Enum):
@@ -24,6 +29,7 @@ class ClassificationMetrics(Enum):
     PPV = auto()
     NPV = auto()
     OPTIMAL_CUTOFF = auto()
+    F1_SCORE = auto()
     ALL = auto()
 
 
@@ -137,6 +143,7 @@ class MetricsComputer:
             tn, fp, fn, tp = cls.confusion_matrix(y_true, y_pred, threshold).ravel()
             return float(tp / (tp + fn)) if (tp + fn) > 0 else 0.0
         except ValueError:
+            print(f"Warning: Confusion matrix not found for threshold {threshold}")
             return 0.0
 
     @classmethod
@@ -156,6 +163,7 @@ class MetricsComputer:
             tn, fp, fn, tp = cls.confusion_matrix(y_true, y_pred, threshold).ravel()
             return float(tn / (tn + fp)) if (tn + fp) > 0 else 0.0
         except ValueError:
+            print(f"Warning: Confusion matrix not found for threshold {threshold}")
             return 0.0
 
     @classmethod
@@ -175,6 +183,7 @@ class MetricsComputer:
             tn, fp, fn, tp = cls.confusion_matrix(y_true, y_pred, threshold).ravel()
             return float(tp / (tp + fp)) if (tp + fp) > 0 else 0.0
         except ValueError:
+            print(f"Warning: Confusion matrix not found for threshold {threshold}")
             return 0.0
 
     @classmethod
@@ -194,7 +203,21 @@ class MetricsComputer:
             tn, fp, fn, tp = cls.confusion_matrix(y_true, y_pred, threshold).ravel()
             return float(tn / (tn + fn)) if (tn + fn) > 0 else 0.0
         except ValueError:
+            print(f"Warning: Confusion matrix not found for threshold {threshold}")
             return 0.0
+
+    @classmethod
+    @type_check(
+        enabled=True,
+        y_true=np.ndarray,
+        y_pred=np.ndarray,
+        dtypes={"y_true": np.int64, "y_pred": np.float64},
+    )
+    def f1_score(cls, y_true: np.ndarray, y_pred: np.ndarray, threshold: float = 0.5) -> float:
+        cls.__check_ground_truth(y_true)
+        cls.__check_prediction_values(y_pred)
+        y_pred_binary = (y_pred > threshold).astype(int)
+        return float(f1_score(y_true, y_pred_binary))
 
     @classmethod
     @type_check(
