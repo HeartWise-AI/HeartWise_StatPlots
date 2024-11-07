@@ -14,12 +14,7 @@ from sklearn.metrics import (
     f1_score
 )
 
-<<<<<<< HEAD:heartwise_statplots/metrics/metrics.py
 from heartwise_statplots.utils.type_check import type_check
-=======
-from .type_check import type_check
->>>>>>> main:metrics_library/metrics.py
-
 
 class ClassificationMetrics(Enum):
     AUC = auto()
