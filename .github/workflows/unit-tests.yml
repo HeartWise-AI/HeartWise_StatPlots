@@ -28,6 +28,7 @@ jobs:
       - name: Install Package from GitHub (dev branch)
         if: github.ref == 'refs/heads/dev'
         run: |
+<<<<<<< HEAD
           pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git@dev
 
       - name: Install Package from GitHub (PR from dev)
@@ -37,11 +38,26 @@ jobs:
         run: |
           pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git@dev
 
+=======
+            pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git@dev
+      
+      - name: Install Package from GitHub (PR from dev)
+        if: >
+          github.event_name == 'pull_request' &&
+            github.event.pull_request.head.ref == 'dev'
+        run: |
+          pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git@dev
+      
+>>>>>>> 7ccb3969c87e596e405f0463441658804fa52031
       - name: Install Package from GitHub (main branch)
         if: github.ref == 'refs/heads/main'
         run: |
           pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> 7ccb3969c87e596e405f0463441658804fa52031
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
