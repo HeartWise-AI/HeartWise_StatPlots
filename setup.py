@@ -17,6 +17,7 @@ setup(
         'scikit-learn',
         'pytest',
         'tqdm',
+        'transformers',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
