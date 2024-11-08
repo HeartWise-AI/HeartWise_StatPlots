@@ -7,6 +7,7 @@ A Python library to make it easier to work with ECG data.
 - [Features](#features)
   - [Metrics Computation](#metrics-computation)
   - [Friendly Type Checking](#friendly-type-checking)
+  - [Hugging Face Wrapper](#hugging-face-wrapper)
   - [File Handling](#file-handling)
 - [Installation](#installation)
 - [Usage](#usage)
