@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from metrics_library.type_check import type_check, TypeCheckError
+from heartwise_statplots.utils.type_check import type_check, TypeCheckError
 from typing import Any, Callable
 
 # Sample functions to test the decorator
@@ -104,8 +104,8 @@ def test_toggle_failure():
 
 def test_execute_failure():
     with pytest.raises(TypeCheckError) as exc_info:
-        execute("not a Callable")  # custom should be callable
-    assert "Argument 'custom' must be of type typing.Callable, not str" in str(exc_info.value)
+        execute("not a Callable")  # 'custom' should be callable
+    assert "Argument 'custom' must be of type Callable, not str" in str(exc_info.value)
 
 def test_combine_arrays_failure():
     # Test for incorrect type (not an array)

@@ -14,8 +14,7 @@ from sklearn.metrics import (
     f1_score
 )
 
-from .type_check import type_check
-
+from heartwise_statplots.utils.type_check import type_check
 
 class ClassificationMetrics(Enum):
     AUC = auto()
@@ -78,7 +77,9 @@ class MetricsComputer:
             y_true_sample = y_true[indices]
             y_pred_sample = y_pred[indices]
             results.append(metric_func(y_true_sample, y_pred_sample))
-        return np.mean(results), np.percentile(results, [2.5, 97.5])
+        
+        ci = np.percentile(results, [2.5, 97.5])
+        return float(np.mean(results)), float(ci[0]), float(ci[1])
 
     # Classification metrics
     @classmethod
@@ -341,8 +342,8 @@ class MetricsComputer:
                 def bootstrap_func(y_t, y_p):
                     return func(y_t, y_p, **kwargs)
 
-                mean, ci = cls.__bootstrap(y_true, y_pred, bootstrap_func, n_iterations)
-                results[metric.name.lower()] = {"mean": mean, "ci": ci}
+                mean, ci_lower, ci_upper = cls.__bootstrap(y_true, y_pred, bootstrap_func, n_iterations)
+                results[metric.name.lower()] = {"mean": mean, "ci_lower": ci_lower, "ci_upper": ci_upper}
             else:
                 results[metric.name.lower()] = func(y_true, y_pred, **kwargs)
 
@@ -409,8 +410,8 @@ class MetricsComputer:
                     return func(y_t, y_p)
 
                 # Perform bootstrapping
-                mean, ci = cls.__bootstrap(y_true, y_pred, bootstrap_func, n_iterations)
-                results[metric.name.lower()] = {"mean": mean, "ci": ci}
+                mean, ci_lower, ci_upper = cls.__bootstrap(y_true, y_pred, bootstrap_func, n_iterations)
+                results[metric.name.lower()] = {"mean": mean, "ci_lower": ci_lower, "ci_upper": ci_upper}
             else:
                 # Compute the metric without bootstrapping
                 results[metric.name.lower()] = func(y_true, y_pred)
