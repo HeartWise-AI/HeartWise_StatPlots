@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='heartwise_statplots', 
-    version='0.1.1',           
+    version='0.1.2',           
     author='Jacques Delfrate',
     author_email='jacques.delfrate@gmail.com',
     description='Package containing utilities for HeartWise projects',
