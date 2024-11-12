@@ -133,7 +133,7 @@ class TestMetricsComputer(unittest.TestCase):
         self.assertIsInstance(results, dict)
         self.assertIn(arg1, results)
         self.assertIn('mean', results[arg1])
-        self.assertIn('ci', results[arg1])
-
+        self.assertIn('ci_lower', results[arg1])
+        self.assertIn('ci_upper', results[arg1])
 if __name__ == '__main__':
     unittest.main()
