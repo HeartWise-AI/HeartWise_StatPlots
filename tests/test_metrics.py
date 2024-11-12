@@ -135,5 +135,6 @@ class TestMetricsComputer(unittest.TestCase):
         self.assertIn('mean', results[arg1])
         self.assertIn('ci_lower', results[arg1])
         self.assertIn('ci_upper', results[arg1])
+        
 if __name__ == '__main__':
     unittest.main()
