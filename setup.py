@@ -18,6 +18,7 @@ setup(
         'pytest',
         'tqdm',
         'transformers',
+        'pydicom'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
