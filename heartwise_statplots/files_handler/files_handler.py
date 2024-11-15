@@ -337,7 +337,7 @@ class DicomReader:
             diagnosis = dicom_annotation.get(key_diagnosis)
             if diagnosis is not None:
                 diagnosis_value = diagnosis.value
-                if not 'REPORT' in diagnosis_value:
+                if 'REPORT' not in diagnosis_value:
                     diagnosis_list.append(diagnosis_value)
 
         return ', '.join(diagnosis_list)
