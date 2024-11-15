@@ -1,8 +1,6 @@
-import pydicom
 import numpy as np
 import matplotlib.pyplot as plt
-import struct
-from files_handler import DicomReader
+from heartwise_statplots.files_handler import DicomReader
 
 # Define the DICOM file path
 dicom_file_path = 'anonymous_ecg.dcm'
