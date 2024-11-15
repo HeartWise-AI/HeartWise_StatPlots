@@ -1,8 +1,12 @@
 import os
 import base64
+import struct
 import numpy as np
 import pandas as pd
 import xml.etree.ElementTree as ET
+
+from pydicom.filereader import dcmread
+from pydicom.dataset import FileDataset
 
 def load_df(path: str) -> pd.DataFrame:
     if path.endswith('.csv'):
@@ -35,13 +39,19 @@ class ECGFileHandler:
             np.save(filename, ecg_signal)
     
     @staticmethod
-    def load_ecg_signal(filename) -> np.ndarray:
+    def load_ecg_signal(filename: str) -> np.ndarray:
         if filename.endswith('.base64'):
             with open(filename, 'r') as f:
                 base64_str = f.read()
             np_array = np.frombuffer(base64.b64decode(base64_str), dtype=np.float32)
-        else:
+        elif filename.endswith('.dcm'):
+            dicom = DicomReader.read_dicom_file(filename)
+            np_array = DicomReader.extract_ecg_from_dicom(dicom)
+        elif filename.endswith('.npy'):
             np_array = np.load(filename)
+        else:
+            raise ValueError("Unsupported file extension. Only .base64, .dcm and .npy are supported.")
+        
         writable_array = np.copy(np_array)
         return writable_array.reshape(-1, 12)
     
@@ -239,3 +249,99 @@ class XMLProcessor:
         # Save summary report
         summary_report_path = os.path.join(output_folder, 'ecg_processing_summary_report.csv')
         summary_df.to_csv(summary_report_path, index=False)
+
+
+class DicomReader:
+    @staticmethod
+    def extract_ecg_from_dicom(dicom: FileDataset) -> np.ndarray:
+        # Ensure WaveformSequence exists
+        if 'WaveformSequence' not in dicom:
+            raise ValueError("No WaveformSequence found in the DICOM file.")
+
+        # Access all waveform sequences
+        waveform_sequences = dicom.WaveformSequence
+
+        # Number of waveform sequences
+        num_waveforms = len(waveform_sequences)
+
+        # Check if at least two waveform sequences exist
+        if num_waveforms < 2:
+            raise ValueError("Less than two waveform sequences found in the DICOM file.")
+
+        # Access the second waveform sequence (index 1)
+        waveform = waveform_sequences[0]
+
+        assert (waveform.WaveformSampleInterpretation == 'SS')
+
+        # Extract waveform data (raw binary)
+        waveform_data = waveform.WaveformData
+
+        # Decode the waveform data based on Waveform Sample Interpretation
+        waveform_sample_interpretation = waveform.get('WaveformSampleInterpretation', 'SS')  # Default to 'SS' if not present
+
+        # Define the data type mapping
+        dtype_mapping = {
+            'SS': np.int16,    # Signed Short
+            'US': np.uint16,   # Unsigned Short
+            'FL': np.float32,  # Floating Point Single
+            'FD': np.float64,  # Floating Point Double
+        }
+
+        # Get the appropriate NumPy data type
+        dtype = dtype_mapping.get(waveform_sample_interpretation, np.int16)  # Default to int16
+
+        # Extract metadata
+        num_channels = waveform.NumberOfWaveformChannels
+        num_samples = waveform.NumberOfWaveformSamples
+
+        # Convert the binary waveform data to a NumPy array
+        unpack_fmt = '<%dh' % (len(waveform_data) / 2)
+        unpacked_waveform_data = struct.unpack(unpack_fmt, waveform_data)
+        waveform_array = np.asarray(
+                    unpacked_waveform_data,
+                    dtype=dtype).reshape(
+                    num_samples,
+                    num_channels).transpose()
+
+        correct_lead_order = [
+            "lead i (einthoven)", 
+            "lead ii", 
+            "lead iii", 
+            "lead avr", 
+            "lead avl", 
+            "lead avf", 
+            "lead v1", 
+            "lead v2", 
+            "lead v3", 
+            "lead v4", 
+            "lead v5", 
+            "lead v6"
+        ]
+        leads = {lead: None for lead in correct_lead_order}
+        for i, channel in enumerate(waveform.ChannelDefinitionSequence):
+            code_meaning = channel.ChannelSourceSequence[0].get('CodeMeaning', '').lower()
+            if not code_meaning in leads:
+                print(f"Unknown lead: {code_meaning}")
+                continue
+            
+            leads[code_meaning] = waveform_array[i] * channel.ChannelSensitivityCorrectionFactor + channel.ChannelBaseline
+
+        return np.vstack([leads[lead] for lead in correct_lead_order])
+    
+    @staticmethod
+    def extract_diagnosis_from_dicom(dicom: FileDataset) -> str:
+        key_diagnosis = (0x0070,0x0006)
+        diagnosis_list = []
+        for i in range(len(dicom.WaveformAnnotationSequence)):
+            dicom_annotation = dicom.WaveformAnnotationSequence[i]
+            diagnosis = dicom_annotation.get(key_diagnosis)
+            if diagnosis is not None:
+                diagnosis_value = diagnosis.value
+                if not 'REPORT' in diagnosis_value:
+                    diagnosis_list.append(diagnosis_value)
+
+        return ', '.join(diagnosis_list)
+        
+    @staticmethod
+    def read_dicom_file(dicom_file: str) -> FileDataset:
+        return dcmread(dicom_file)
