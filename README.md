@@ -30,10 +30,19 @@ A Python library to make it easier to work with ECG data.
    python -m venv heartwise_statplots
    ```
 
+2. Download Repo
+  git clone https://github.com/HeartWise-AI/HeartWise_StatPlots.git
+
 2. Install the library:
+  With pip
    ```
-   pip install git+https://github.com/HeartWise-AI/HeartWise_StatPlots.git
+   pip install -e HeartWise_StatPlots
    ```
+
+  With uv
+    ```
+   uv pip install -e HeartWise_StatPlots
+   ``` 
 
 3. Ready to go! 🚀
 
