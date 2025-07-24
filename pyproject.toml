@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "heartwise_statplots"
+version = "0.1.2"
+description = "Package containing utilities for HeartWise projects"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Jacques Delfrate", email = "jacques.delfrate@gmail.com"}
+]
+maintainers = [
+    {name = "Jacques Delfrate", email = "jacques.delfrate@gmail.com"}
+]
+keywords = ["heartwise", "statistics", "plots", "medical"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.6"
+dependencies = [
+    "numpy",
+    "pandas",
+    "seaborn",
+    "scikit-learn",
+    "pytest",
+    "tqdm",
+    "transformers",
+    "pydicom",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "black",
+    "flake8",
+    "mypy",
+]
+
+[project.urls]
+Homepage = "https://github.com/HeartWise-AI/HeartWise_StatPlots"
+Repository = "https://github.com/HeartWise-AI/HeartWise_StatPlots.git"
+Issues = "https://github.com/HeartWise-AI/HeartWise_StatPlots/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["heartwise_statplots*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.txt", "*.md", "*.yml", "*.yaml"]
+
+[tool.black]
+line-length = 88
+target-version = ['py36']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"] 
