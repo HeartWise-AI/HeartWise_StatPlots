@@ -40,7 +40,7 @@ A Python library to make it easier to work with ECG data.
    ```
 
   With uv
-    ```
+   ```
    uv pip install -e HeartWise_StatPlots
    ``` 
 
